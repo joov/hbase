@@ -1,4 +1,4 @@
-FROM hypriot/rpi-java:latest
+FROM jsurf/rpi-java:latest
 MAINTAINER Johannes Wenzel 
 
 RUN [ "cross-build-start" ]
