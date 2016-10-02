@@ -1,39 +1,35 @@
 FROM hypriot/rpi-java:latest
-MAINTAINER Johannes Wenzel <johannes.wenzel@web.de>MAINTAINER Johannes Wenzel <johannes.wenzel@web.de>MAINTAINER Johannes Wenzel <johannes.wenzel@web.de>
+MAINTAINER Johannes Wenzel 
 
-#=======================
-# Install utils
-#=======================
-COPY install-default.sh install-default.sh 
-RUN ["/bin/bash", "install-default.sh"]
+RUN [ "cross-build-start" ]
+
+ENV MAVEN_VERSION 3.3.9
+ENV MAVEN_TARBALL apache-maven-${MAVEN_VERSION}-bin.tar.gz
+
+RUN cd /tmp \
+   && wget http://apache.mirror.iphh.net/maven/maven-3/${MAVEN_VERSION}/binaries/${MAVEN_TARBALL} \
+   && tar xf ${MAVEN_TARBALL} --directory /var/lib \
+   && mv /var/lib/apache-maven-* /var/lib/apache-maven \
+   && rm ${MAVEN_TARBALL}
+
+ENV PATH "$PATH:/var/lib/apache-maven/bin"
 
 
-#=======================
-# Install JDK7 
-#=======================
-COPY install-jdk7.sh install-jdk7.sh 
-RUN ["/bin/bash", "install-jdk7.sh"]
+RUN apt-get update \
+    && apt-get install git
 
-#=======================
-# Install CDH 5.1 + HBase
-#=======================
-# ref : http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH5/latest/CDH5-Quick-Start/cdh5qs_yarn_pseudo.html
-COPY install-cdh5-hbase.sh install-cdh5-hbase.sh
-RUN ["/bin/bash", "install-cdh5-hbase.sh"]
+# Pull down HBase and build it into /root/hbase-bin.
+RUN git clone http://git.apache.org/hbase.git -b master
+RUN mvn clean install -DskipTests assembly:single -f ./hbase/pom.xml \
+    && mkdir -p hbase-bin \
+    && tar xzf /root/hbase/hbase-assembly/target/*tar.gz --strip-components 1 -C /root/hbase-bin
 
-#=======================
-# Configure HBase pseduo-distributed
-#=======================
+# Set HBASE_HOME, add it to the path, and start HBase.
+ENV HBASE_HOME /root/hbase-bin
+ENV PATH /root/hbase-bin/bin:/usr/java/bin:/usr/local/apache-maven/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-COPY setup.sh setup.sh
-COPY hbase-site.xml /etc/hbase/conf/hbase-site.xml 
-COPY core-site.xml /etc/hadoop/conf/core-site.xml
-RUN ["/bin/bash", "setup.sh"]
+RUN  [ "cross-build-end" ]
 
-#=======================
-# Start services.
-#=======================
-COPY start.sh start.sh
 # zookeeper
 EXPOSE 2181
 # HBase master
@@ -44,6 +40,5 @@ EXPOSE 65010
 EXPOSE 65020
 # HBase regionserver web UI
 EXPOSE 65030
-CMD ["/bin/bash", "start.sh"]
 
-
+CMD ["/bin/bash", "-c", "start-hbase.sh; hbase shell"]
