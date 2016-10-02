@@ -2,4 +2,4 @@
 
 HBase for RPI
 
-[GPL v3](http://www.gnu.org/licenses/quick-guide-gplv3.html) applies to usage of neo4j and this docker image
+[Apache License 2.0](https://hbase.apache.org/license.html) applies to usage of HBase and this docker image
