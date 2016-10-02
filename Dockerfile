@@ -6,6 +6,10 @@ RUN [ "cross-build-start" ]
 ENV MAVEN_VERSION 3.3.9
 ENV MAVEN_TARBALL apache-maven-${MAVEN_VERSION}-bin.tar.gz
 
+
+RUN apt-get update \
+    && apt-get install git wget
+
 RUN cd /tmp \
    && wget http://apache.mirror.iphh.net/maven/maven-3/${MAVEN_VERSION}/binaries/${MAVEN_TARBALL} \
    && tar xf ${MAVEN_TARBALL} --directory /var/lib \
@@ -14,9 +18,6 @@ RUN cd /tmp \
 
 ENV PATH "$PATH:/var/lib/apache-maven/bin"
 
-
-RUN apt-get update \
-    && apt-get install git
 
 # Pull down HBase and build it into /root/hbase-bin.
 RUN git clone http://git.apache.org/hbase.git -b master
