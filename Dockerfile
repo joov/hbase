@@ -10,7 +10,7 @@ COPY ./install.sh /hbase-working
 
 RUN apt-get update \
     && apt-get install wget
-RUN chmod +x /hbase-setup/install.sh \
+RUN chmod +x /hbase-working/install.sh \
     && /hbase-working/install.sh hbase-1.2.3-bin.tar.gz http://apache.mirror.iphh.net/hbase/1.2.3/hbase-1.2.3-bin.tar.gz \
     hbase \
     && mkdir hbase \
