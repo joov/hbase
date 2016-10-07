@@ -25,4 +25,5 @@ EXPOSE 65000    65010          65020         65030
 WORKDIR /usr/local/hbase
 ENV HBASE_HOME /usr/local/hbase
 
-CMD bin/hbase-deamon.sh foreground_start master
+ENTRYPOIMT [ "bin/hbbase-deamon.sh", "foreground_start" ]
+CMD [ "master" ]
