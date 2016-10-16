@@ -19,8 +19,8 @@ RUN chmod +x /hbase-working/install.sh \
 COPY ./hbase-site.xml /usr/local/hbase/conf
 RUN [ "cross-build-end" ]
 
-# HBase master, master web UI, regionserver, regionserver web UI
-EXPOSE 65000    65010          65020         65030
+# HBase zookeeper master, master web UI, regionserver, regionserver web UI
+EXPOSE  2181      16000   16010          16020         16030
 
 WORKDIR /usr/local/hbase
 ENV HBASE_HOME /usr/local/hbase
